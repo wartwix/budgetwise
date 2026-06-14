@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/budgetwise/static/css/main.bff6bca8.css",
-    "main.js": "/budgetwise/static/js/main.0611d5f0.js",
+    "main.js": "/budgetwise/static/js/main.e45bd24d.js",
     "index.html": "/budgetwise/index.html",
     "main.bff6bca8.css.map": "/budgetwise/static/css/main.bff6bca8.css.map",
-    "main.0611d5f0.js.map": "/budgetwise/static/js/main.0611d5f0.js.map"
+    "main.e45bd24d.js.map": "/budgetwise/static/js/main.e45bd24d.js.map"
   },
   "entrypoints": [
     "static/css/main.bff6bca8.css",
-    "static/js/main.0611d5f0.js"
+    "static/js/main.e45bd24d.js"
   ]
 }
