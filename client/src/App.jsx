@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 // ============================================================================
 //  ⚙️  CONFIG — Remplace YOUR_TAILSCALE_IP par l'IP Tailscale de ton serveur.
 // ============================================================================
-const API = 'https://budgetwise-api.onrender.com';
+const API = 'https://budgetwise-g571.onrender.com';
 
 // ============================================================================
 //  🎨  CSS — Constante unique injectée (design "Banque Privée / Institutionnel",
