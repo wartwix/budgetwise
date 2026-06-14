@@ -1,81 +1,113 @@
-import React, { useContext, useState } from 'react';
-import { BudgetContext } from '../context/BudgetContext';
+import React, { useState } from 'react';
+import { useBudget, CATEGORIES } from '../context/BudgetContext';
+import TransactionModal from '../components/TransactionModal';
 
-function Transactions() {
-  const { transactions, addTransaction } = useContext(BudgetContext);
-  const [formData, setFormData] = useState({ desc: '', amount: '', category: 'Alimentation', type: 'expense' });
+export default function Transactions() {
+  const { transactions, deleteTransaction } = useBudget();
+  const [showModal, setShowModal]   = useState(false);
+  const [editing, setEditing]       = useState(null);
+  const [filterType, setFilterType] = useState('all');
+  const [filterCat, setFilterCat]   = useState('all');
+  const [search, setSearch]         = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.desc || !formData.amount) return;
+  const fmt = n => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n);
 
-    addTransaction({
-      id: Date.now(),
-      date: new Date().toLocaleDateString('fr-FR'),
-      category: formData.category,
-      desc: formData.desc,
-      amount: formData.type === 'expense' ? -Math.abs(formData.amount) : Math.abs(formData.amount),
-      type: formData.type
-    });
-    setFormData({ desc: '', amount: '', category: 'Alimentation', type: 'expense' });
-  };
+  const filtered = transactions.filter(t => {
+    if (filterType !== 'all' && t.type !== filterType) return false;
+    if (filterCat !== 'all' && t.category !== filterCat) return false;
+    if (search && !t.label.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const openEdit = (tx) => { setEditing(tx); setShowModal(true); };
+  const closeModal = () => { setShowModal(false); setEditing(null); };
 
   return (
-    <div className="card p-4">
-      <h3 className="text-vert-foret mb-4">Historique des transactions</h3>
-      
-      <form onSubmit={handleSubmit} className="row g-3 mb-4 bg-light p-3 rounded">
-        <div className="col-md-3">
-          <input type="text" className="form-control" placeholder="Description..." value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} required />
-        </div>
-        <div className="col-md-2">
-          <input type="number" className="form-control" placeholder="Montant €" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required />
-        </div>
-        <div className="col-md-2">
-          <select className="form-select" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
-            <option value="expense">Dépense</option>
-            <option value="income">Revenu</option>
-          </select>
-        </div>
-        <div className="col-md-3">
-          <select className="form-select" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-            <option>Alimentation</option>
-            <option>Transport</option>
-            <option>Loisirs</option>
-            <option>Santé</option>
-            <option>Logement</option>
-            <option>Salaire/Revenu</option>
-          </select>
-        </div>
-        <div className="col-md-2">
-          <button type="submit" className="btn btn-success w-100">+ Ajouter</button>
-        </div>
-      </form>
+    <div className="animate-in">
+      {showModal && <TransactionModal onClose={closeModal} editing={editing} />}
 
-      <table className="table table-hover">
-        <thead className="table-light">
-          <tr>
-            <th>Date</th>
-            <th>Catégorie</th>
-            <th>Description</th>
-            <th className="text-end">Montant</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map(t => (
-            <tr key={t.id}>
-              <td>{t.date}</td>
-              <td><span className={`badge ${t.type === 'income' ? 'bg-success' : 'bg-secondary'}`}>{t.category}</span></td>
-              <td>{t.desc}</td>
-              <td className={`text-end fw-bold ${t.type === 'income' ? 'text-success' : 'text-danger'}`}>
-                {t.amount > 0 ? `+${t.amount}` : t.amount} €
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+        <div className="page-header" style={{ marginBottom: 0 }}>
+          <h1>Transactions 💳</h1>
+          <p>Historique complet de vos mouvements</p>
+        </div>
+        <button className="btn-bw btn-bw-primary" onClick={() => setShowModal(true)}>
+          + Ajouter
+        </button>
+      </div>
+
+      {/* Filtres */}
+      <div className="bw-card" style={{ marginBottom: 20, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input className="bw-input" placeholder="🔍 Rechercher..." value={search}
+          onChange={e => setSearch(e.target.value)} style={{ flex: 1, minWidth: 180 }} />
+        <select className="bw-input bw-select" value={filterType} onChange={e => setFilterType(e.target.value)}>
+          <option value="all">Tous les types</option>
+          <option value="revenu">Revenus</option>
+          <option value="depense">Dépenses</option>
+        </select>
+        <select className="bw-input bw-select" value={filterCat} onChange={e => setFilterCat(e.target.value)}>
+          <option value="all">Toutes catégories</option>
+          {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+        </select>
+      </div>
+
+      <div className="bw-card">
+        {filtered.length === 0 ? (
+          <div className="empty-state"><p>Aucune transaction trouvée</p></div>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Date', 'Description', 'Catégorie', 'Type', 'Montant', ''].map(h => (
+                  <th key={h} style={{ textAlign: 'left', fontSize: '.7rem', textTransform: 'uppercase',
+                    letterSpacing: '.06em', color: 'var(--text-muted)', padding: '10px 12px',
+                    borderBottom: '1px solid var(--border)' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(t => {
+                const cat = CATEGORIES.find(c => c.id === t.category);
+                return (
+                  <tr key={t.id} style={{ borderBottom: '1px solid rgba(48,54,61,.4)' }}>
+                    <td style={{ padding: '12px', fontSize: '.82rem', color: 'var(--text-muted)',
+                      fontFamily: 'var(--font-mono)' }}>
+                      {new Date(t.date).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td style={{ padding: '12px', fontWeight: 600, fontSize: '.88rem' }}>{t.label}</td>
+                    <td style={{ padding: '12px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5,
+                        background: `${cat?.color || '#8b949e'}20`, color: cat?.color || '#8b949e',
+                        padding: '3px 10px', borderRadius: 20, fontSize: '.75rem', fontWeight: 600 }}>
+                        {cat?.icon} {cat?.label || t.category}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <span style={{ fontSize: '.75rem', padding: '3px 10px', borderRadius: 20,
+                        background: t.type === 'revenu' ? 'var(--green-glow)' : 'var(--red-glow)',
+                        color: t.type === 'revenu' ? 'var(--green)' : 'var(--red)', fontWeight: 600 }}>
+                        {t.type}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px', fontFamily: 'var(--font-mono)', fontWeight: 700 }}
+                      className={t.type === 'revenu' ? 'amount-positive' : 'amount-negative'}>
+                      {t.type === 'revenu' ? '+' : '-'}{fmt(t.amount)}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={() => openEdit(t)} className="btn-bw btn-bw-ghost"
+                          style={{ padding: '4px 10px', fontSize: '.75rem' }}>✏️</button>
+                        <button onClick={() => deleteTransaction(t.id)} className="btn-bw btn-bw-danger"
+                          style={{ padding: '4px 10px', fontSize: '.75rem' }}>🗑️</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
-
-export default Transactions;
