@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/budgetwise/static/css/main.138602c3.css",
-    "main.js": "/budgetwise/static/js/main.c3518d1e.js",
+    "main.css": "/budgetwise/static/css/main.bff6bca8.css",
+    "main.js": "/budgetwise/static/js/main.0611d5f0.js",
     "index.html": "/budgetwise/index.html",
-    "main.138602c3.css.map": "/budgetwise/static/css/main.138602c3.css.map",
-    "main.c3518d1e.js.map": "/budgetwise/static/js/main.c3518d1e.js.map"
+    "main.bff6bca8.css.map": "/budgetwise/static/css/main.bff6bca8.css.map",
+    "main.0611d5f0.js.map": "/budgetwise/static/js/main.0611d5f0.js.map"
   },
   "entrypoints": [
-    "static/css/main.138602c3.css",
-    "static/js/main.c3518d1e.js"
+    "static/css/main.bff6bca8.css",
+    "static/js/main.0611d5f0.js"
   ]
 }
