@@ -1,0 +1,37 @@
+:root {
+  --forest-green: #145A32;
+  --success-green: #27AE60;
+  --alert-red: #E74C3C;
+  --project-purple: #6C3483;
+  --light-grey: #F4F6F7;
+}
+
+body {
+  background-color: var(--light-grey);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-budgetwise {
+  background-color: var(--forest-green);
+}
+
+.navbar-budgetwise .navbar-brand,
+.navbar-budgetwise .nav-link {
+  color: white !important;
+}
+
+.navbar-budgetwise .nav-link.active {
+  background-color: var(--success-green);
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.card-indicator {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.text-success-custom { color: var(--success-green); }
+.text-alert-custom { color: var(--alert-red); }
+.bg-project-purple { background-color: var(--project-purple) !important; }
